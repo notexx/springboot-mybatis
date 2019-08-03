@@ -24,6 +24,7 @@ public class JobServiceImplTest {
     @Test
     public void testFindById() {
         Job job = jobService.findById(Long.valueOf(1));
+        System.out.println(job.getId());
         Assert.assertNotNull(job.getId());
     }
 

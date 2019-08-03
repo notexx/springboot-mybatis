@@ -1,0 +1,21 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    write:
+      url: jdbc:mysql://localhost:33065/replicas_db?characterEncoding=UTF-8
+      username: root
+      password: root123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      type: com.alibaba.druid.pool.DruidDataSource
+
+    read:
+      url: jdbc:mysql://localhost:33066/replicas_db?characterEncoding=UTF-8
+      username: root
+      password: root123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      type: com.alibaba.druid.pool.DruidDataSource
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+

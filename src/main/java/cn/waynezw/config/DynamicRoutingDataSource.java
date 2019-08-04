@@ -37,13 +37,8 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
         setDefaultTargetDataSource(writeDataSource);
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put(DataSourceKey.WRITE.name(), writeDataSource);
-        if (this.readDataSources == null) {
-            readDataSourceSize = 0;
-        } else {
-            for (int i = 0; i < readDataSources.size(); i++) {
-                targetDataSources.put(DataSourceKey.READ.name() + i, readDataSources.get(i));
-            }
-            readDataSourceSize = readDataSources.size();
+        if(readDataSources != null) {
+            targetDataSources.put(DataSourceKey.READ.name(), readDataSources);
         }
         setTargetDataSources(targetDataSources);
         super.afterPropertiesSet();
@@ -58,28 +53,7 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
                 || readDataSourceSize <= 0) {
             return DataSourceKey.WRITE.name();
         }
-
-        int index = 1;
-
-        if (readDataSourcePollPattern == 1) {
-            //轮询方式
-            long currValue = counter.incrementAndGet();
-            if ((currValue + 1) >= MAX_POOL) {
-                    try {
-                    lock.lock();
-                    if ((currValue + 1) >= MAX_POOL) {
-                        counter.set(0);
-                    }
-                } finally {
-                    lock.unlock();
-                }
-            }
-            index = (int) (currValue % readDataSourceSize);
-        } else {
-            //随机方式
-            index = ThreadLocalRandom.current().nextInt(0, readDataSourceSize);
-        }
-        return dataSourceKey.name() + index;
+        return DataSourceKey.READ.name();
     }
 
     public void setWriteDataSource(Object writeDataSource) {

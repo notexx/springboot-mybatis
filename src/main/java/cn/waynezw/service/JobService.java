@@ -17,4 +17,6 @@ public interface JobService {
     Job findById(Long id);
 
     Job updateStatusById(Long id, int status);
+
+    Job saveBack(Job job);
 }

@@ -24,6 +24,9 @@
     <select id="findAliveJobs" resultMap="BaseResultMap">
         SELECT * FROM  `job` where status = 0 order by status asc
     </select>
+    <select id="findByName"  resultMap="BaseResultMap">
+        SELECT * FROM  `job` WHERE job_name = #{jobName}
+    </select>
 
     <update id="update" parameterType="cn.waynezw.model.Job">
         UPDATE job SET

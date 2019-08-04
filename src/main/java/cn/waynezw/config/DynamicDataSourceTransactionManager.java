@@ -1,45 +1,37 @@
 package cn.waynezw.config;
 
 import cn.waynezw.common.DataSourceKey;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-//@EnableTransactionManagement
+@EnableTransactionManagement
 //@Configuration
 public class DynamicDataSourceTransactionManager extends DataSourceTransactionManager {
+    private static final Logger logger = LoggerFactory.getLogger(DynamicDataSourceTransactionManager.class);
 
-    @Autowired
-    @Qualifier(value = "writeDataSource")
-    private DataSource dataSource;
 
-    @Bean(name = "transactionManager")
-    public DataSourceTransactionManager transactionManagers() {
-        logger.info("-------------------- transactionManager init ---------------------");
-        return new DataSourceTransactionManager(dataSource);
+    public DynamicDataSourceTransactionManager(DataSource dataSource) {
+        super(dataSource);
     }
 
     /**
      * 只读事务到读库，读写事务到写库
+     *
      * @param transaction
      * @param definition
      */
     @Override
     protected void doBegin(Object transaction, TransactionDefinition definition) {
-
         //设置数据源
         boolean readOnly = definition.isReadOnly();
-        if(readOnly) {
+        logger.info("doBegin : [{}]", readOnly);
+        if (readOnly) {
             DynamicDataSourceHolder.setDataSourceKey(DataSourceKey.READ);
         } else {
             DynamicDataSourceHolder.setDataSourceKey(DataSourceKey.WRITE);
@@ -49,6 +41,7 @@ public class DynamicDataSourceTransactionManager extends DataSourceTransactionMa
 
     /**
      * 清理本地线程的数据源
+     *
      * @param transaction
      */
     @Override
@@ -56,5 +49,4 @@ public class DynamicDataSourceTransactionManager extends DataSourceTransactionMa
         super.doCleanupAfterCompletion(transaction);
         DynamicDataSourceHolder.clearDataSourceKey();
     }
-
 }

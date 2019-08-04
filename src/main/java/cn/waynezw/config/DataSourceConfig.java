@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import java.util.Map;
 public class DataSourceConfig {
 
     @Bean
+    @Primary
     @ConfigurationProperties("spring.datasource.write")
     public DataSource writeDataSource() {
         DruidDataSource writeDataSource = new DruidDataSource();
@@ -88,6 +91,11 @@ public class DataSourceConfig {
         configurer.setBasePackage("cn.waynezw.mapper");
         configurer.setMarkerInterface(Mapper.class);
         return configurer;
+    }
+
+    @Bean
+    public DataSourceTransactionManager txManager(DataSource dataSource) {
+        return new DynamicDataSourceTransactionManager(dataSource);
     }
 
 }

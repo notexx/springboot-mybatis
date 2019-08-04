@@ -5,6 +5,7 @@ import cn.waynezw.model.Job;
 import cn.waynezw.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -48,8 +49,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Job updateStatusById(Long id, int status) {
         jobMapper.updateStatusById(id, status);
+        if (status != 2) {
+            throw new RuntimeException();
+        }
         return jobMapper.findById(id);
     }
 }

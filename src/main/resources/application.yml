@@ -16,7 +16,8 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.alibaba.druid.pool.DruidDataSource
 
-#mybatis:
-#  mapper-locations: classpath*:mapper/*.xml
-#  config-location: classpath:config/mybatis-config.xml
-
+logging:
+  level:
+    cn:
+      waynezw:
+        mapper: debug

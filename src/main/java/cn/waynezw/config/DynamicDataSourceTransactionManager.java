@@ -13,14 +13,8 @@ import javax.sql.DataSource;
 //@Configuration
 public class DynamicDataSourceTransactionManager extends DataSourceTransactionManager {
 
-    @Autowired
-    @Qualifier(value = "writeDataSource")
-    private DataSource dataSource;
-
-    @Bean(name = "transactionManager")
-    public DataSourceTransactionManager transactionManagers() {
-        logger.info("-------------------- transactionManager init ---------------------");
-        return new DataSourceTransactionManager(dataSource);
+    public DynamicDataSourceTransactionManager(DataSource dataSource) {
+        super(dataSource);
     }
 
     /**

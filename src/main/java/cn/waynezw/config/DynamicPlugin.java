@@ -1,5 +1,6 @@
 package cn.waynezw.config;
 
+import cn.waynezw.common.DataSource;
 import cn.waynezw.common.DataSourceKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.keygen.SelectKeyGenerator;

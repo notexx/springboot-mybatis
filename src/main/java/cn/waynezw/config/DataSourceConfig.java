@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -27,6 +29,7 @@ public class DataSourceConfig {
 
     @Bean
     @ConfigurationProperties("spring.datasource.write")
+    @Primary
     public DataSource writeDataSource() {
         DruidDataSource writeDataSource = new DruidDataSource();
         return writeDataSource;
@@ -78,15 +81,19 @@ public class DataSourceConfig {
     }
 
 
-
     @Bean
-    public MapperScannerConfigurer scannerConfigurer(){
+    public MapperScannerConfigurer scannerConfigurer() {
         MapperScannerConfigurer configurer = new MapperScannerConfigurer();
         configurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
         configurer.setSqlSessionTemplateBeanName("sqlSessionTemplate");
         configurer.setBasePackage("cn.waynezw.mapper");
         configurer.setMarkerInterface(Mapper.class);
         return configurer;
+    }
+
+    @Bean
+    public DataSourceTransactionManager txManager(DataSource dataSource) {
+        return new DynamicDataSourceTransactionManager(dataSource);
     }
 
 }

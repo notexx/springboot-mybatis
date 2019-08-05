@@ -28,7 +28,8 @@ public class JobServiceImplTest {
 
     @Test
     public void testFindById() {
-        Job job = jobService.findById(Long.valueOf(1));
+        Job job = jobService.findById(Long.valueOf(5));
+        System.out.println(job);
         Assert.assertNotNull(job.getId());
     }
 
@@ -55,7 +56,7 @@ public class JobServiceImplTest {
 
     @Test
     public void testUpdateStatusById() {
-        Job job = jobService.updateStatusById(Long.valueOf(1), 1);
+        Job job = jobService.updateStatusById(Long.valueOf(5), 1);
         Assert.assertNotNull(job.getId());
     }
     @Test

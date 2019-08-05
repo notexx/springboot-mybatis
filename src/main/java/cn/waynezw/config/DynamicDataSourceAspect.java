@@ -35,7 +35,7 @@ public class DynamicDataSourceAspect {
         Boolean isQueryMethod = isQueryMethod(point);
         if (isQueryMethod) {
             DynamicDataSourceHolder.useReadDataSource();
-            logger.info("拦截器[切换]数据源[{}] 方法 [{}], REAS count[{}]",
+            logger.info("拦截器[切换]数据源[{}] 方法 [{}], READ count[{}]",
                     DynamicDataSourceHolder.getDataSourceKey(), point.getSignature(), countRead.incrementAndGet());
         } else {
             DynamicDataSourceHolder.useWriteDataSource();
@@ -47,8 +47,7 @@ public class DynamicDataSourceAspect {
     @After("daoAspect()")
     public void restoreDataSource(JoinPoint point) {
         DynamicDataSourceHolder.clearDataSourceKey();
-        logger.info("拦截器[恢复]数据源 [{}] 方法 [{}]",
-                DynamicDataSourceHolder.getDataSourceKey(), point.getSignature());
+//        logger.info("拦截器[恢复]数据源 [{}] 方法 [{}]", DynamicDataSourceHolder.getDataSourceKey(), point.getSignature());
     }
 
     /**

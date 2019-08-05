@@ -52,6 +52,8 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Job updateStatusById(Long id, int status) {
+        Job byId = jobMapper.findById(id);
+        System.out.println(byId);
         jobMapper.updateStatusById(id, status);
         Random random = new Random();
         int i = random.nextInt(100);
@@ -59,7 +61,7 @@ public class JobServiceImpl implements JobService {
         if (i < 50) {
             throw new RuntimeException();
         }
-        return jobMapper.findById(id);
+        return byId;
     }
 
     @Override

@@ -31,7 +31,7 @@ import java.util.Map;
 public class DataSourceConfig {
 
     @Bean
-    @Primary
+//    @Primary
     @ConfigurationProperties("spring.datasource.write")
     public DataSource writeDataSource() {
         DruidDataSource writeDataSource = new DruidDataSource();
@@ -46,27 +46,26 @@ public class DataSourceConfig {
     }
 
     @Bean
-    public DataSource myRoutingDataSource(@Qualifier("writeDataSource") DataSource writeDataSource,
+    public DataSource routingDataSource(@Qualifier("writeDataSource") DataSource writeDataSource,
                                           @Qualifier("readDataSource") DataSource readDataSource) {
         Map<Object, Object> targetDataSources = new HashMap<>();
-        targetDataSources.put(DataSourceKey.WRITE, writeDataSource);
-        targetDataSources.put(DataSourceKey.READ, readDataSource);
-        DynamicRoutingDataSource myRoutingDataSource = new DynamicRoutingDataSource();
-        myRoutingDataSource.setWriteDataSource(writeDataSource);
-        myRoutingDataSource.setTargetDataSources(targetDataSources);
-        return myRoutingDataSource;
+        targetDataSources.put(DataSourceKey.WRITE.name(), writeDataSource);
+        targetDataSources.put(DataSourceKey.READ.name(), readDataSource);
+        DynamicRoutingDataSource routingDataSource = new DynamicRoutingDataSource();
+        routingDataSource.setDefaultTargetDataSource(writeDataSource);
+        routingDataSource.setTargetDataSources(targetDataSources);
+        return routingDataSource;
     }
 
     @Bean(name = "sqlSessionFactory")
     @Autowired
-    public SqlSessionFactory sqlSessionFactory(DataSource myRoutingDataSource) throws IOException {
+    public SqlSessionFactory sqlSessionFactory(@Qualifier("routingDataSource") DataSource routingDataSource) throws IOException {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
-        bean.setDataSource(myRoutingDataSource);
+        bean.setDataSource(routingDataSource);
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         bean.setTypeAliasesPackage("cn.waynezw.mapper");
         bean.setMapperLocations(resolver.getResources("classpath*:mapper/*.xml"));
         try {
-
             SqlSessionFactory session = bean.getObject();
             return session;
         } catch (Exception e) {
@@ -92,9 +91,8 @@ public class DataSourceConfig {
         configurer.setMarkerInterface(Mapper.class);
         return configurer;
     }
-
     @Bean
-    public DataSourceTransactionManager txManager(DataSource dataSource) {
+    public DataSourceTransactionManager txManager(@Qualifier("routingDataSource") DataSource dataSource) {
         return new DynamicDataSourceTransactionManager(dataSource);
     }
 

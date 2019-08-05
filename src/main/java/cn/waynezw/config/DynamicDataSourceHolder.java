@@ -58,24 +58,6 @@ public class DynamicDataSourceHolder {
         holder.set(DataSourceKey.WRITE);
     }
 
-    /**
-     * 当使用只读数据源时通过轮循方式选择要使用的数据源
-     */
-    public static void useReadDataSource() {
-        lock.lock();
-        try {
-            int datasourceKeyIndex = counter % readDataSourceKeys.size();
-            Object o = readDataSourceKeys.get(datasourceKeyIndex);
-            holder.set(DataSourceKey.valueOf(o.toString()));
-            counter++;
-        } catch (Exception e) {
-            logger.error("切换数据源错误： {}", e.getMessage());
-            useWriteDataSource();
-            e.printStackTrace();
-        } finally {
-            lock.unlock();
-        }
-    }
 
     /**
      * Get current DataSource

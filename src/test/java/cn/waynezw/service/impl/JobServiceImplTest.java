@@ -12,6 +12,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -28,9 +29,14 @@ public class JobServiceImplTest {
 
     @Test
     public void testFindById() {
-        Job job = jobService.findById(Long.valueOf(1));
-        System.out.println(job.getId());
+        Job job = jobService.findById(Long.valueOf(5));
+        System.out.println(job);
         Assert.assertNotNull(job.getId());
+    }
+    @Test
+    public void testFindAll() {
+        List<Job> all = jobService.findAll();
+        all.stream().forEach((job) -> System.out.println(job));
     }
     @Test
     public void testUpdateStatusById() {

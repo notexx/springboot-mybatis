@@ -14,6 +14,7 @@ public interface JobMapper {
     @DataSource(value = DataSourceKey.WRITE)
     Job findById(Long id);
 
+    @DataSource(value = DataSourceKey.WRITE)
     List<Job> findAll();
 
     List<Job> findAliveJobs();

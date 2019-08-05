@@ -4,7 +4,6 @@ import cn.waynezw.common.DataSourceKey;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -29,7 +28,7 @@ public class DataSourceConfig {
 
     @Bean
     @ConfigurationProperties("spring.datasource.write")
-    @Primary
+//    @Primary
     public DataSource writeDataSource() {
         DruidDataSource writeDataSource = new DruidDataSource();
         return writeDataSource;
@@ -46,11 +45,12 @@ public class DataSourceConfig {
     public DataSource myRoutingDataSource(@Qualifier("writeDataSource") DataSource writeDataSource,
                                           @Qualifier("readDataSource") DataSource readDataSource) {
         Map<Object, Object> targetDataSources = new HashMap<>();
-        targetDataSources.put(DataSourceKey.WRITE, writeDataSource);
-        targetDataSources.put(DataSourceKey.READ, readDataSource);
+        targetDataSources.put(DataSourceKey.WRITE.name(), writeDataSource);
+        targetDataSources.put(DataSourceKey.READ.name(), readDataSource);
         DynamicRoutingDataSource myRoutingDataSource = new DynamicRoutingDataSource();
-        myRoutingDataSource.setWriteDataSource(writeDataSource);
         myRoutingDataSource.setTargetDataSources(targetDataSources);
+        myRoutingDataSource.setDefaultTargetDataSource(writeDataSource);
+//        myRoutingDataSource.determineCurrentLookupKey();
         return myRoutingDataSource;
     }
 
@@ -92,7 +92,7 @@ public class DataSourceConfig {
     }
 
     @Bean
-    public DataSourceTransactionManager txManager(DataSource dataSource) {
+    public DataSourceTransactionManager txManager(@Qualifier("myRoutingDataSource") DataSource dataSource) {
         return new DynamicDataSourceTransactionManager(dataSource);
     }
 

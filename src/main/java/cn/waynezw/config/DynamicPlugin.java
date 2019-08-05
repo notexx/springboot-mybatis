@@ -16,8 +16,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,8 +45,25 @@ public class DynamicPlugin implements Interceptor {
         if (!synchronizationActive) {
             Object[] objects = invocation.getArgs();
             MappedStatement ms = (MappedStatement) objects[0];
-
+            String id = ms.getId();
+            int i = id.lastIndexOf(".");
+            String substring = id.substring(0, i);
+            Class<?> aClass = Class.forName(substring);
+            Method[] methods = aClass.getMethods();
             DataSourceKey dataSourceKey = null;
+
+            for (int j = 0; j < methods.length; j++) {
+                if (Objects.equals(methods[j].getName(), id.substring(i+1))) {
+                    DataSource annotation = methods[j].getAnnotation(DataSource.class);
+                    if (annotation != null) {
+                        dataSourceKey = annotation.value();
+                        DynamicDataSourceHolder.setDataSourceKey(dataSourceKey);
+                        logger.info("设置方法[{}] 使用 [{}] 数据源, SqlCommandType [{}]..", ms.getId(), dataSourceKey.name(), ms.getSqlCommandType().name());
+                        return invocation.proceed();
+                    }
+                    break;
+                }
+            }
 
             if ((dataSourceKey = cacheMap.get(ms.getId())) == null) {
                 //读方法
